@@ -1,7 +1,6 @@
 package com.seneca.test.controller;
 
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,9 @@ public class TaskController {
 			@RequestParam(name="vendors")List<String> vendorNames,
 			@RequestParam(name="percentages")List<Integer> vendorTaskShare
 			){
-		String[] arr = {"10","20","20"};
+		if(vendorNames.size()!= vendorTaskShare.size()){
+			throw new ValidationException(101, "Total Number of Vendors and Percentages should be equal");
+		}
 		int totalPercentage = 0;
 		for(int taskShare : vendorTaskShare){
 			totalPercentage+=taskShare;
@@ -33,15 +34,19 @@ public class TaskController {
 		if(totalPercentage!=100){
 			throw new ValidationException(100, "Total Percentages not equal to 100");
 		}
-		
 		Map<String, Integer> response = distributeTask(totalTask, vendorNames,vendorTaskShare);
 		return new ResponseEntity<Map<String, Integer>>(response, HttpStatus.OK);
 	}
 	
-	
+	/***
+	 * Distribute the given tasks among the vendors and return a Map containing VendorName and 
+	 * @param totalTasks
+	 * @param vendorNames
+	 * @param percentages
+	 * @return
+	 */
 	public Map<String, Integer> distributeTask(int totalTasks, List<String> vendorNames, List<Integer> percentages){
 		Map<String, Integer> taskDistributionMap = new HashMap<String,Integer>();
-		Boolean positiveDelta = null;
 		int vendorCount = vendorNames.size();
 		float delta = 0;
 		for(int i=0; i< vendorCount;i++){
@@ -51,16 +56,7 @@ public class TaskController {
 				taskCount += delta;
 			}
 			int actualTaskCount = (int)Math.round(taskCount);
-			delta += (taskCount - actualTaskCount); 
-/*			if(positiveDelta == null){
-				actualTaskCount = Math.floorDiv(totalTasks *  vendorShare, 100);
-				delta += (taskCount - actualTaskCount); 
-			} else if (positiveDelta == Boolean.TRUE){
-				
-				delta += (taskCount - actualTaskCount); 
-
-			}
-*/
+			delta += (taskCount - actualTaskCount);
 			taskDistributionMap.put(vendorNames.get(i), actualTaskCount);
 		}
 		return taskDistributionMap;
