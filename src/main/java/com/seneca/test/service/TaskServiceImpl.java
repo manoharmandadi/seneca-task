@@ -1,8 +1,7 @@
 package com.seneca.test.service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +16,9 @@ public class TaskServiceImpl implements TaskService {
 	public static final Logger logger = LoggerFactory.getLogger(TaskController.class);
 
 	@Override
-	public Map<String, Integer> distributeTasks(int totalTasks, List<String> vendorNames, List<Integer> percentages) {
-		Map<String, Integer> taskDistributionMap = new HashMap<String,Integer>();
-		int vendorCount = vendorNames.size();
+	public List<Integer> distributeTasks(int totalTasks, List<Integer> percentages) {
+		List<Integer> taskDistribution = new ArrayList<Integer>();
+		int vendorCount = percentages.size();
 		double delta = 0;
 		for(int i=0; i< vendorCount;i++){
 			int vendorShare = percentages.get(i);
@@ -38,14 +37,14 @@ public class TaskServiceImpl implements TaskService {
 				logger.info("Last Vendor.Delta value "+delta+". Actual Task Count:"+actualTaskCount);
 				actualTaskCount = (int)Math.round(actualTaskCount + delta);
 			}
-			taskDistributionMap.put(vendorNames.get(i), actualTaskCount);
+			taskDistribution.add(actualTaskCount);
 		}
 		int total=0;
-		for(String key:taskDistributionMap.keySet()){
-			total+=taskDistributionMap.get(key);
+		for(int key:taskDistribution){
+			total+=key;
 		}
 		logger.info("Total"+total);
-		return taskDistributionMap;
+		return taskDistribution;
 	}
 
 }

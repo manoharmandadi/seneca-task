@@ -1,7 +1,6 @@
 package com.seneca.test.controller;
 
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +28,11 @@ public class TaskController {
 	private TaskService taskService;
 	
 	@GetMapping(path="/taskDistribution", produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Map<String, Integer>> distributeTasks(@RequestParam(name="totalTasks") int totalTask,
-			@RequestParam(name="vendors")List<String> vendorNames,
+	public ResponseEntity<List<Integer>> distributeTasks(@RequestParam(name="totalTasks") int totalTask,
+			@RequestParam(name="vendors") int vendorCount,
 			@RequestParam(name="percentages")List<Integer> vendorTaskShare
 			){
-		if(vendorNames.size()!= vendorTaskShare.size()){
+		if(vendorCount!= vendorTaskShare.size()){
 			logger.debug("Vendor and Percentages count doesnt match.");
 			throw new ValidationException(101, "Total Number of Vendors and Percentages should be equal");
 		}
@@ -45,8 +44,8 @@ public class TaskController {
 			logger.debug("Total Percentages is not equal to 100.");
 			throw new ValidationException(100, "Total Percentages not equal to 100");
 		}
-		Map<String, Integer> response = taskService.distributeTasks(totalTask, vendorNames,vendorTaskShare);
-		return new ResponseEntity<Map<String, Integer>>(response, HttpStatus.OK);
+		List<Integer> response = taskService.distributeTasks(totalTask,vendorTaskShare);
+		return new ResponseEntity<List<Integer>>(response, HttpStatus.OK);
 	}
 	
 }
